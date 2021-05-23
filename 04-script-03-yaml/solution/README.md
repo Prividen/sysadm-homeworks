@@ -63,12 +63,32 @@ while True:
     saved_ip = resolved_ip
 
     with open(saved_ip_json_fn, "w") as json_fd:
-        json_fd.write(json.dumps(saved_ip_to_dump))
+        json_fd.write(json.dumps(saved_ip_to_dump, indent=1))
 
     with open(saved_ip_yaml_fn, 'w') as yaml_fd:
         yaml_fd.write(yaml.dump(saved_ip_to_dump, explicit_start=True))
 
     time.sleep(sleep_time)
+```
+Образцы вывода:
+```json
+[
+ {
+  "drive.google.com": "216.58.211.206"
+ },
+ {
+  "mail.google.com": "216.58.205.197"
+ },
+ {
+  "google.com": "172.217.21.14"
+ }
+]
+```
+```yaml
+---
+- drive.google.com: 216.58.211.206
+- mail.google.com: 216.58.205.197
+- google.com: 172.217.21.14
 ```
 ---
 > Так как команды в нашей компании никак не могут прийти к единому мнению о том, какой формат разметки данных использовать: JSON или YAML, нам нужно реализовать парсер из одного формата в другой. Он должен уметь:
