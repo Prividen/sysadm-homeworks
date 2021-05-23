@@ -17,24 +17,25 @@ from pathlib import Path
 from git import Repo
 from github import Github
 
-
-def print_usage(err_msg):
-    print(f"Error: {err_msg}\n",
-          f"Usage: {sys.argv[0].split('/')[-1]} <commit_msg> <configs_uri> [local_repo]",
-          "<commit_msg>\t- your commit message",
-          "<configs_uri>\t- where configs should be taken, /local/path or user@remote.srv:/path",
-          "[local_repo]\t- path to local git repo with configs, if missed - current dir",
-          "GitHub token must be provided in GITHUB_TOKEN env",
-          "GitHub repo can be provided in GITHUB_REPO env",
-          "master branch name can be provided in MASTER_BRANCH env",
-          sep="\n", file=sys.stderr
-          )
-    return ""
+SHOW_USAGE = True
 
 
-def err_exit(err_msg):
-    print(f"Error: {err_msg}", file=sys.stderr)
-    exit(1)
+def usage():
+    return "\n".join([
+            f"Usage: {sys.argv[0].split('/')[-1]} <commit_msg> <configs_uri> [local_repo]",
+            "<commit_msg>\t- your commit message",
+            "<configs_uri>\t- where configs should be taken, /local/path or user@remote.srv:/path",
+            "[local_repo]\t- path to local git repo with configs, if missed - current dir",
+            "- GitHub token must be provided in GITHUB_TOKEN env",
+            "- GitHub repo can be provided in GITHUB_REPO env",
+            "- master branch name can be provided in MASTER_BRANCH env"
+    ])
+
+
+def err_exit(err_msg, show_usage=False):
+    if show_usage:
+        err_msg = f"{err_msg}\n{usage()}"
+    raise SystemExit(f"Error: {err_msg}")
 
 
 def path_normalization(rel_path):
@@ -44,21 +45,23 @@ def path_normalization(rel_path):
 # configuration
 gh_token = os.environ.get('GITHUB_TOKEN')
 if not gh_token:
-    raise SystemExit(print_usage("GitHub token must be provided in GITHUB_TOKEN environment variable"))
+    err_exit("GitHub token must be provided in GITHUB_TOKEN environment variable", SHOW_USAGE)
 
 master_branch = os.environ.get('MASTER_BRANCH')
 if not master_branch:
     master_branch = 'main'
 
+commit_msg = ''
 try:
     commit_msg = sys.argv[1]
 except IndexError:
-    raise SystemExit(print_usage("Please provide a commit message"))
+    err_exit("Please provide a commit message", SHOW_USAGE)
 
+configs_uri = ''
 try:
     configs_uri = sys.argv[2]
 except IndexError:
-    raise SystemExit(print_usage("Please provide path to configs"))
+    err_exit("Please provide path to configs", SHOW_USAGE)
 
 try:
     git_repo = sys.argv[3]
