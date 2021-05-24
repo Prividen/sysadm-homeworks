@@ -36,8 +36,8 @@ def guess_file_type(guess_file):
         except IndexError:
             err_exit(f"No useful content found in {guess_file}")
 
-        # try to avoid YAML comments
-        if re.match(r'^\s*#', content_line):
+        # try to avoid empty lines and YAML comments
+        if re.match(r'^\s*#', content_line) or re.match(r'^\s*$', content_line):
             del(content[0])
             continue
 
