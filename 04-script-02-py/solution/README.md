@@ -50,7 +50,7 @@ result_os = os.popen(' && '.join(bash_command)).read()
 
 for result in result_os.split('\n'):
     if result.find('modified') != -1:
-        prepare_result = result.replace('\tmodified:   ', '')
+        prepare_result = result.replace('\tmodified:   ', f"{git_full_path}/")
         print(prepare_result)
 
 ```
